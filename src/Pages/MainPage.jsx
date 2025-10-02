@@ -83,7 +83,7 @@ function DevelopmentSlideshow() {
 
   return (
     <div className="flex justify-center items-center w-full flex-grow">
-      <div className="bg-white rounded-xl shadow-lg flex flex-col items-center sm:p-3 animate-fadeUp w-full flex-grow mx-auto relative md:h-[30rem] h-[30rem] hover:shadow-2xl hover:-translate-y-1 transition">
+      <div className="bg-white rounded-xl shadow-lg flex flex-col items-center sm:p-3  w-full flex-grow mx-auto relative md:h-[30rem] h-[30rem] hover:shadow-2xl hover:-translate-y-1 transition">
         
         {/* Arrows */}
         <button
@@ -224,9 +224,9 @@ const MainPage = () => {
                 `bg-white rounded-xl shadow-lg px-10 py-6 flex flex-col items-center 
                 border-l-4 border-green-400 hover:-translate-y-1 hover:shadow-xl transition
                 aspect-[5/2] min-w-[200px] w-full md:w-[300px] sm:max-w-xs
-                animate-[fadeUpSmall_0.7s_ease-out]`
+              `
               }
-              style={{animationDelay: `${0.1 + idx * 0.1}s`}}>
+              >
             <div>
               <div className="text-4xl mb-2 flex justify-center ">{stat.icon}</div>
               <div className="text-2xl font-bold text-green-700 mb-1 flex justify-center">{stat.number}</div>
