@@ -16,7 +16,7 @@ const PlacesSection = () => (
         {/* पाझर तलाव */}
         <div className="bg-white rounded-xl shadow-lg p-4 fade-in flex flex-col justify-between items-center h-full hover:shadow-2xl hover:-translate-y-1 transition">
           <img src="images/talav.jpg" alt="पाझर तलाव" className="w-full h-48 object-cover rounded-xl mb-4" />
-          <h5 className="text-lg font-bold mb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 12h16"/><path d="M12 4v16"/></svg> अर्जुनवडी तलाव</h5>
+          <h5 className="text-lg font-bold mb-2 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 12h16"/><path d="M12 4v16"/></svg>पाझर तलाव</h5>
           <p className="text-justify">पाझर तलाव गावाच्या उत्तर भागात स्थित आहे. पावसाळ्यात तलावाचे सौंदर्य अधिक खुलते. </p>
         </div>
 
