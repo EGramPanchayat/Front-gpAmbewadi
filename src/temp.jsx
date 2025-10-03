@@ -32,6 +32,7 @@ const stats = [
 
 
 
+
 function useDevelopmentWorks() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -82,37 +83,50 @@ function DevelopmentSlideshow() {
 
   return (
     <div className="flex justify-center items-center w-full flex-grow">
-      <div className="w-full sm:w-[500px] md:w-[750px] lg:w-[900px] h-[380px] sm:h-[420px] flex flex-col shadow-lg rounded-xl overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg flex flex-col items-center sm:p-3  w-full flex-grow mx-auto relative md:h-[30rem] h-[30rem] hover:shadow-2xl hover:-translate-y-1 transition">
+        
+        {/* Arrows */}
+        <button
+          onClick={goPrev}
+          className="absolute left-2 top-1/2 transform -translate-y-1/2 p-3 text-3xl text-green-700 hover:text-orange-500 bg-white rounded-full shadow-md z-10"
+        >
+          &#8592;
+        </button>
+        <button
+          onClick={goNext}
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 p-3 text-3xl text-green-700 hover:text-orange-500 bg-white rounded-full shadow-md z-10"
+        >
+          &#8594;
+        </button>
 
-        {/* Image Section */}
-        <div className="h-[180px] sm:h-[220px] w-full flex justify-center items-center overflow-hidden bg-gray-100">
+        {/* Image */}
+        <div className="w-full px-5 md:px-5 md:py-5 h-[60%] md:h-[70%] flex-shrink-0 flex flex-col justify-center items-center mb-0">
           <img
             src={item.image.url}
             alt={item.title}
-            className="h-full w-full object-cover"
+            className="w-full h-full object-cover rounded"
           />
         </div>
 
-        {/* Info Section */}
-        <div className="w-full flex flex-col justify-between items-center bg-white px-3 py-3 h-[170px] sm:h-[180px]">
-          <div className="flex flex-col items-center text-center w-full px-2">
-            <h5 className="text-base sm:text-lg font-bold mb-1 mt-1 break-words line-clamp-2">
+        {/* Content */}
+        <div className="w-full sm:py-5 h-[40%] md:h-[30%] flex flex-col justify-between items-center bg-white px-2">
+          <div className="flex flex-col items-center text-center">
+            <h5 className="text-lg font-bold mb-1 mt-5 break-words">
               {item.title}
             </h5>
-            <p className="text-xs sm:text-sm text-gray-700 break-words line-clamp-3">
+            <p className="mb-1 text-sm text-gray-700 break-words">
               {item.description}
             </p>
           </div>
 
           {/* Dots */}
-          <div className="flex gap-2 mt-2">
+          <div className="flex gap-2 mt-2 sm:mt-1 mb-2 sm:mb-0">
             {developmentItems.map((_, idx) => (
-              <button
+              <span
                 key={idx}
-                onClick={() => setCurrent(idx)}
-                className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                className={`w-3 h-3 rounded-full ${
                   idx === current ? "bg-green-600" : "bg-gray-300"
-                }`}
+                } inline-block`}
               />
             ))}
           </div>
@@ -193,7 +207,7 @@ const MainPage = () => {
           />
   <div className="absolute inset-0 flex flex-col items-center justify-top text-center px-4 py-8 md:py-20">
       <h1 className="text-3xl md:text-[2.5rem] font-extrabold drop-shadow md:mb-5 text-green-700">
-             ग्रामपंचायत आंबेवाडी मध्ये स्वागत आहे
+            ग्रामपंचायत आंबेवाडी मध्ये स्वागत आहे
           </h1>
           <p className="text-xl md:text-3xl mb-6 font-bold text-green-700">ता.आटपाडी  जि.सांगली </p>
         </div>
@@ -210,11 +224,11 @@ const MainPage = () => {
                 `bg-white rounded-xl shadow-lg px-10 py-6 flex flex-col items-center 
                 border-l-4 border-green-400 hover:-translate-y-1 hover:shadow-xl transition
                 aspect-[5/2] min-w-[200px] w-full md:w-[300px] sm:max-w-xs
-                animate-[fadeUpSmall_0.7s_ease-out]`
+              `
               }
-              style={{animationDelay: `${0.1 + idx * 0.1}s`}}>
+              >
             <div>
-               <div className="text-4xl mb-2 flex justify-center ">{stat.icon}</div>
+              <div className="text-4xl mb-2 flex justify-center ">{stat.icon}</div>
               <div className="text-2xl font-bold text-green-700 mb-1 flex justify-center">{stat.number}</div>
               <div className="text-gray-600 text-base flex justify-center">{stat.label}</div>
             </div>

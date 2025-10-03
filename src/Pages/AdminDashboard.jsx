@@ -7,8 +7,7 @@ import DevelopementWorkAdmin from "../AdminComponents/DevelopementWorkAdmin";
 import NewsUpload from "../AdminComponents/NewsUpload";
 import QRUploadModal from "../AdminComponents/QRUploadModal";
 import { Link } from "react-scroll";
-
-
+import Navbar from "../Components/Navbar";
 
 // ---------- Helpers ----------
 const newMember = (data = {}) => ({
@@ -65,7 +64,13 @@ const Card = memo(function Card({ title, data, onChange, allowRemove, onRemove }
           type="file"
           accept="image/*"
           className="hidden"
-          onChange={e => onChange("image", e.target.files[0])}
+          onChange={e => {
+            const file = e.target.files[0];
+            if (file) {
+              onChange("image", file);
+              onChange("imageUrl", URL.createObjectURL(file)); // instant preview
+            }
+          }}
         />
       </label>
       {allowRemove && (
@@ -88,6 +93,8 @@ export default function AdminDashboard() {
   const [upsarpanch, setUpsarpanch] = useState({ name: "", mobile: "", image: null, imageUrl: "" });
   const [members, setMembers] = useState([]);
   const [officers, setOfficers] = useState([]);
+  const [deletedMemberIds, setDeletedMemberIds] = useState([]);
+  const [deletedOfficerIds, setDeletedOfficerIds] = useState([]);
   const [qrModalOpen, setQrModalOpen] = useState(false);
 
   useEffect(() => {
@@ -106,7 +113,7 @@ export default function AdminDashboard() {
           image: null,
           imageUrl: data.upsarpanch?.image || "",
         });
-        setMembers((data.members || []).map(m => newMember(m)));
+        setMembers((data.members || []).map(m => ({ ...newMember(m), _id: m._id })));
 
         const defaultRoles = [
           "तलाठी",
@@ -121,7 +128,7 @@ export default function AdminDashboard() {
         setOfficers(
           defaultRoles.map(role => {
             const found = existing.find(o => o.role === role) || {};
-            return newOfficer(role, found);
+            return { ...newOfficer(role, found), _id: found._id };
           })
         );
       } catch {
@@ -144,10 +151,24 @@ export default function AdminDashboard() {
 
   const addMember = () => setMembers(ms => [...ms, newMember()]);
 
-  const removeMember = id => setMembers(ms => ms.filter(m => m.id !== id));
+  const removeMember = id => {
+    setMembers(ms => {
+      const member = ms.find(m => m.id === id);
+      if (member?._id) setDeletedMemberIds(ids => [...ids, member._id]);
+      return ms.filter(m => m.id !== id);
+    });
+  };
 
   const updateOfficer = (id, key, val) =>
     setOfficers(os => os.map(o => (o.id === id ? { ...o, [key]: val } : o)));
+
+  const removeOfficer = id => {
+    setOfficers(os => {
+      const officer = os.find(o => o.id === id);
+      if (officer?._id) setDeletedOfficerIds(ids => [...ids, officer._id]);
+      return os.filter(o => o.id !== id);
+    });
+  };
 
   const validate = () => {
     const ten = /^\d{10}$/;
@@ -182,19 +203,24 @@ export default function AdminDashboard() {
     if (upsarpanch.image) fd.append("upsarpanch", upsarpanch.image);
 
     members.forEach((m, idx) => {
+      if (m._id) fd.append(`members[${idx}][_id]`, m._id);
       fd.append(`members[${idx}][id]`, m.id);
       fd.append(`members[${idx}][name]`, m.name);
       fd.append(`members[${idx}][mobile]`, m.mobile);
-      if (m.image) fd.append(`memberImages[${m.id}]`, m.image);
+      if (m.image) fd.append(`memberImages[${m._id || m.id}]`, m.image);
     });
 
     officers.forEach((o, idx) => {
+      if (o._id) fd.append(`staff[${idx}][_id]`, o._id);
       fd.append(`staff[${idx}][id]`, o.id);
       fd.append(`staff[${idx}][role]`, o.role);
       fd.append(`staff[${idx}][name]`, o.name);
       fd.append(`staff[${idx}][mobile]`, o.mobile);
-      if (o.image) fd.append(`officerImages[${o.id}]`, o.image);
+      if (o.image) fd.append(`officerImages[${o._id || o.id}]`, o.image);
     });
+
+    deletedMemberIds.forEach(id => fd.append("deletedMemberIds[]", id));
+    deletedOfficerIds.forEach(id => fd.append("deletedOfficerIds[]", id));
 
     try {
       await axioesInstance.post("/exboard-karyakari-mandal", fd, {
@@ -213,25 +239,15 @@ export default function AdminDashboard() {
   return (
     <>
       <QRUploadModal open={qrModalOpen} onClose={() => setQrModalOpen(false)} />
-      {/* NAVBAR */}
       <nav className="bg-green-700 text-white shadow-md fixed top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-              <img
-                src="/images/satyamev.jpg"
-                alt="Logo"
-                className="h-10 w-10 rounded-full object-cover border-2 border-white shadow"
-              />
-              <div className="flex flex-col">
-                <h1 className="text-lg md:text-xl font-bold tracking-wide whitespace-nowrap">
-                  ग्रामपंचायत आंबेवाडी
-                </h1>
-                <span className="text-sm md:text-base text-white/80">
-                  ता. आटपाडी जि. सांगली
-                </span>
-              </div>
-            </div>
-
+            <img src="/images/satyamev.jpg" alt="Logo" className="h-10 w-10 rounded-full object-cover border-2 border-white shadow" />
+            <h1 className="text-lg md:text-xl font-bold tracking-wide whitespace-nowrap">
+              ग्रामपंचायत आंबेवाडी
+            </h1>
+            
+          </div>
           <div className="relative w-full">
             <button
               id="navbar-toggle"
@@ -293,7 +309,6 @@ export default function AdminDashboard() {
         </div>
       </nav>
 
-      {/* MAIN */}
       <main className="pt-24 min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 p-6">
         <section id="news-section" className="max-w-7xl mx-auto mb-12">
           <NewsUpload />
@@ -302,8 +317,6 @@ export default function AdminDashboard() {
           <DevelopementWorkAdmin />
         </section>
 
-        {/* EXEC BOARD */}
-        {/* EXEC BOARD */}
         <section id="exec-section" className="max-w-7xl mx-auto mb-12">
           <form
             onSubmit={handleSubmit}
@@ -313,9 +326,8 @@ export default function AdminDashboard() {
               गाव कार्यकारिणी व्यवस्थापन
             </h2>
 
-      
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-               <Card
+              <Card
                 title="सरपंच"
                 data={sarpanch}
                 onChange={(k, v) => setSarpanch(s => ({ ...s, [k]: v }))}
@@ -346,7 +358,6 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            {/* Officers */}
             <h3 className="text-3xl font-bold mb-4 border-t pt-10 text-green-700 text-center">
               अधिकारी
             </h3>
@@ -357,23 +368,23 @@ export default function AdminDashboard() {
                   title={o.role}
                   data={o}
                   onChange={(k, v) => updateOfficer(o.id, k, v)}
+                  allowRemove={false}
+                  onRemove={() => removeOfficer(o.id)}
                 />
               ))}
             </div>
-              {/* Save Button at the bottom */}
-              <div className="mt-10 flex justify-center">
-                <button
-                  type="button"
-                  className={`bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded shadow w-full max-w-md text-xl ${saving ? 'opacity-60 cursor-not-allowed' : ''}`}
-                  onClick={handleSubmit}
-                  disabled={saving}
-                >
-                  {saving ? 'Saving...' : 'Save'}
-                </button>
-              </div>
+            <div className="mt-10 flex justify-center">
+              <button
+                type="button"
+                className={`bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded shadow w-full max-w-md text-xl ${saving ? 'opacity-60 cursor-not-allowed' : ''}`}
+                onClick={handleSubmit}
+                disabled={saving}
+              >
+                {saving ? 'Saving...' : 'Save'}
+              </button>
+            </div>
           </form>
         </section>
-
       </main>
 
       <ToastContainer position="top-right" autoClose={4000} theme="colored" />
